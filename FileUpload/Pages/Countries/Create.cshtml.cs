@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Azure.Storage.Blobs;
+using FileUpload.Models;
+using FileUpload.Protected;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using FileUpload.Models;
-using Microsoft.AspNetCore.Hosting;
 using System.IO;
-using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace FileUpload.Pages.Countries {
     public class CreateModel : PageModel {
         private readonly FileUpload.Models.FileUploadContext _context;
-        public IWebHostEnvironment _environment;
+        public IWebHostEnvironment _environment { get; set; }
 
         public CreateModel(FileUpload.Models.FileUploadContext context, IWebHostEnvironment environment) {
             _context = context;
@@ -27,7 +25,7 @@ namespace FileUpload.Pages.Countries {
         [BindProperty]
         public Country Country { get; set; }
         [BindProperty]
-        public IFormFile Upload { get; set; } // The upload has to be a separate property
+        public IFormFile FormFileToBeUploaded { get; set; } // The upload has to be a separate property
 
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
@@ -40,7 +38,7 @@ namespace FileUpload.Pages.Countries {
 
             //string filePath = Path.Combine(rootPath, Country.FormFile.FileName);
 
-            Country.FileName = "Test" + Upload.FileName; // Can extract the name, but can I turn a FormFile into a FileStream?
+            Country.FileName = "Test" + FormFileToBeUploaded.FileName; // Can extract the name, but can I turn a FormFile into a FileStream?
 
             if (!ModelState.IsValid) {
                 return Page();
@@ -49,7 +47,12 @@ namespace FileUpload.Pages.Countries {
             _context.Country.Add(Country);
             await _context.SaveChangesAsync();
 
+            //BlobContainerClient containerClient = new BlobContainerClient(Secrets.connectionString, "images");
+            BlobClient blobClient = new BlobClient(connectionString: Secrets.connectionString, blobContainerName: "images", blobName: Country.FileName);
 
+            using Stream uploadFileStream = FormFileToBeUploaded.OpenReadStream();
+            await blobClient.UploadAsync(uploadFileStream);
+            uploadFileStream.Close();
 
             //using (FileStream fs = new FileStream(filePath, FileMode.Create)) {
             //    await Country.FormFile.CopyToAsync(fs);
