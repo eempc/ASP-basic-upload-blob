@@ -48,10 +48,16 @@ namespace FileUpload.Pages.Cats
             await _context.SaveChangesAsync();
 
             using (Stream stream = FormFileToBeUploaded.OpenReadStream()) {
-                StorageCredentials cred = new StorageCredentials(Secrets.storageName, Secrets.storageKey);
-                Uri url = new Uri(Secrets.imagesContainer);
+                StorageCredentials cred = new StorageCredentials(Secrets.storageName2, Secrets.storageKey2);
+                Uri url = new Uri(Secrets.imageContainer2);
 
+                // The following container was premade, but if it wasn't, there could be a check for if container exists
                 CloudBlobContainer container = new CloudBlobContainer(url, cred);
+                if (!container.Exists()) {
+                    return RedirectToPage("./Index");
+                    // Create the container?
+                    // In production it would always be create container for the images belonging to that listing
+                }
 
                 string fileName = "Testing" + FormFileToBeUploaded.FileName;
                 CloudBlockBlob blockBlob = container.GetBlockBlobReference(fileName);

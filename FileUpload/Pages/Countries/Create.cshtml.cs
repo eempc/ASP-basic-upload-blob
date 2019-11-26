@@ -45,7 +45,7 @@ namespace FileUpload.Pages.Countries {
             //(BlobContainerClient containerClient =) await blobServiceClient.CreateBlobContainerAsync(containerName);
 
             //BlobContainerClient containerClient = new BlobContainerClient(Secrets.connectionString, "images");
-            BlobClient blobClient = new BlobClient(connectionString: Secrets.connString2, blobContainerName: "thumbnails", blobName: Country.FileName);
+            BlobClient blobClient = new BlobClient(connectionString: Secrets.connectionString2, blobContainerName: "images", blobName: Country.FileName);
 
             //FormFileToBeUploaded.ContentType = "image/png";
 

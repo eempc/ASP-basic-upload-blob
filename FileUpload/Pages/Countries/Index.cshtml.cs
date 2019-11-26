@@ -27,7 +27,7 @@ namespace FileUpload.Pages.Countries {
 
         public async Task OnGetAsync() {
             Country = await _context.Country.ToListAsync();
-            BlobContainerClient blobClient = new BlobContainerClient(connectionString: Secrets.connString2, blobContainerName: "thumbnails");
+            BlobContainerClient blobClient = new BlobContainerClient(connectionString: Secrets.connectionString2, blobContainerName: "thumbnails");
 
             await foreach (BlobItem item in blobClient.GetBlobsAsync()) {
                 

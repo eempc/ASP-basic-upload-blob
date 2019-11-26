@@ -29,10 +29,10 @@ namespace FileUpload.Pages.Cats
         {
             Cat = await _context.Cat.ToListAsync();
 
-            Uri url = new Uri(Secrets.thumbnailContainer);
-            StorageCredentials cred = new StorageCredentials(Secrets.storageName, Secrets.storageKey);
+            Uri containerUrl = new Uri(Secrets.thumbContainer2); // Must be a public container to download
+            StorageCredentials cred = new StorageCredentials(Secrets.storageName2, Secrets.storageKey2);
 
-            CloudBlobContainer container = new CloudBlobContainer(url, cred);
+            CloudBlobContainer container = new CloudBlobContainer(containerUrl, cred);
             BlobContinuationToken token = null;
             BlobResultSegment resultSegment = null;
 
