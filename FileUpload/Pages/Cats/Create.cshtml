@@ -18,7 +18,7 @@
                 <input asp-for="Cat.Name" class="form-control" />
                 <span asp-validation-for="Cat.Name" class="text-danger"></span>
             </div>
-            <input type="file" asp-for="FormFileToBeUploaded" />
+            <input type="file" asp-for="FormFileToBeUploaded" multiple />
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>

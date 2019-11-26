@@ -32,7 +32,8 @@ namespace FileUpload.Pages.Cats
         public Cat Cat { get; set; }
         // 1 Create FormFile
         [BindProperty]
-        public IFormFile FormFileToBeUploaded { get; set; }
+        public IFormFileCollection FormFileToBeUploaded { get; set; }
+        
 
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
@@ -47,22 +48,26 @@ namespace FileUpload.Pages.Cats
             _context.Cat.Add(Cat);
             await _context.SaveChangesAsync();
 
-            using (Stream stream = FormFileToBeUploaded.OpenReadStream()) {
-                StorageCredentials cred = new StorageCredentials(Secrets.storageName2, Secrets.storageKey2);
-                Uri url = new Uri(Secrets.imageContainer2);
+            foreach (var item in FormFileToBeUploaded) {
+                using (Stream stream = item.OpenReadStream()) {
+                    StorageCredentials cred = new StorageCredentials(Secrets.storageName2, Secrets.storageKey2);
+                    Uri url = new Uri(Secrets.imageContainer2);
 
-                // The following container was premade, but if it wasn't, there could be a check for if container exists
-                CloudBlobContainer container = new CloudBlobContainer(url, cred);
-                if (!container.Exists()) {
-                    return RedirectToPage("./Index");
-                    // Create the container?
-                    // In production it would always be create container for the images belonging to that listing
+                    // The following container was premade, but if it wasn't, there could be a check for if container exists
+                    CloudBlobContainer container = new CloudBlobContainer(url, cred);
+                    if (!container.Exists()) {
+                        return RedirectToPage("./Index");
+                        // Create the container?
+                        // In production it would always be create container for the images belonging to that listing
+                    }
+
+                    string fileName = "Testing" + item.FileName;
+                    CloudBlockBlob blockBlob = container.GetBlockBlobReference(fileName);
+                    await blockBlob.UploadFromStreamAsync(stream);
                 }
-
-                string fileName = "Testing" + FormFileToBeUploaded.FileName;
-                CloudBlockBlob blockBlob = container.GetBlockBlobReference(fileName);
-                await blockBlob.UploadFromStreamAsync(stream);
             }
+
+
 
             return RedirectToPage("./Index");
         }

@@ -82,7 +82,7 @@ az functionapp config appsettings set --name <name-of-app> --resource-group <Res
 THUMBNAIL_WIDTH=100 FUNCTIONS_EXTENSION_VERSION=~2
 ```
 
-3. Deploy the resizing code (it's premade by MS) on https://github.com/Azure-Samples/function-image-upload-resize and means you must use the thumbnails and images container names
+3. Deploy the resizing code (it's premade by MS) on https://github.com/Azure-Samples/function-image-upload-resize and means you must use the `thumbnails` and `images` container names
 
 `az functionapp deployment source config --name $functionapp --resource-group $resourceGroupName --branch master --manual-integration --repo-url https://github.com/Azure-Samples/function-image-upload-resize`
 
@@ -97,6 +97,8 @@ THUMBNAIL_WIDTH=100 FUNCTIONS_EXTENSION_VERSION=~2
 12. In Filters tab, tick the box Enable subject filtering
 13. Subject Begins with: /blobServices/default/containers/images/blobs/
 14. Create
+
+Repeat for each file type? :/
 
 ## Download
 
