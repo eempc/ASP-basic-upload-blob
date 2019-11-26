@@ -1,11 +1,24 @@
 ﻿@page
 @model FileUpload.Pages.Countries.IndexModel
+@using Azure.Storage.Blobs.Models;
 
 @{
     ViewData["Title"] = "Index";
 }
 
 <h1>Index</h1>
+
+@if (Model.blobList.Count() > 0) {
+    @foreach (BlobItem item in Model.blobList) {
+        <div>
+            <p>@item.Name returns the file name correctly, e.g. "MyImage001.png"</p>
+            <p>@item.Properties.ContentType is readonly and returns "application/octet-stream"</p>
+            <p>@item.GetType() and @item.ToString() both returns BlobItem object</p>               
+            <img src="@item" /> This is obviously not going to work
+        </div>
+    }
+}
+
 
 <p>
     <a asp-page="Create">Create New</a>
@@ -23,20 +36,20 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Country) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FileName)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.Country) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FileName)
+                </td>
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
