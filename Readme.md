@@ -3,7 +3,7 @@
 ## Set up Azure
 
 1. Create a storage account (can be done in portal or CLI)
-	* Performance/Access tier: Standard/Hot  
+	* Performance/Access tier: Standard/Hot
 	* Account kind: StorageV2 (general purpose)]
 	* Make a note of connection string and key
 2. Create two containers and record their direct URIs
@@ -21,7 +21,7 @@ Azure blob storage is ready to receive images
 
 ```
 [BindProperty]
-public IFormFile FormFileToBeUploaded { get; set; } // In the PageModel 
+public IFormFile FormFileToBeUploaded { get; set; } // In the PageModel
 
 // The following can be sequestered away in a static class
 using (Stream stream = FormFileToBeUploaded.OpenReadStream()) {
@@ -54,7 +54,7 @@ using (Stream stream = FormFileToBeUploaded.OpenReadStream()) {
                 <input asp-for="Cat.Name" class="form-control" />
                 <span asp-validation-for="Cat.Name" class="text-danger"></span>
             </div>
-           <input type="file" asp-for="FormFileToBeUploaded" />
+           <input type="file" asp-for="FormFileToBeUploaded" (multiple) />
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
@@ -91,7 +91,7 @@ THUMBNAIL_WIDTH=100 FUNCTIONS_EXTENSION_VERSION=~2
 6. Select your function app in Portal
 7. Expand the Thumbnail function in Function (Read Only)
 8. Click Add Event Grid Subscription
-9. In Basic tab, give event a name, and choose Event Grid Schema. 
+9. In Basic tab, give event a name, and choose Event Grid Schema.
 10. Select Topic type to be  storage account and topic resource is your storage account (the csa..... one)
 11. Untick Subscribe to all event types and choose Blob Created in the next drop down
 12. In Filters tab, tick the box Enable subject filtering
@@ -125,12 +125,12 @@ public static async Task<List<string>> GetThumbnailUrls() {
 		}
 
 		token = resultSegment.ContinuationToken;
-	} while (token != null);   
+	} while (token != null);
 
 	// return imageUrls;
 
 	return await Task.FromResult(imageUrls);
-} 
+}
 ```
 
 * In razor page

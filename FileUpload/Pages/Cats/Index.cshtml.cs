@@ -36,8 +36,10 @@ namespace FileUpload.Pages.Cats
             BlobContinuationToken token = null;
             BlobResultSegment resultSegment = null;
 
+            string prefixCheck = "Testingt"; // Get only file names beginning with "Testingt"
+
             do {
-                resultSegment = await container.ListBlobsSegmentedAsync("", true, BlobListingDetails.All, 10, token, null, null);
+                resultSegment = await container.ListBlobsSegmentedAsync(prefixCheck, true, BlobListingDetails.All, 10, token, null, null);
 
                 foreach (var item in resultSegment.Results) {
                     imageUrls.Add(item.StorageUri.PrimaryUri.ToString());
