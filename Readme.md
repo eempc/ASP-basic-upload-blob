@@ -54,10 +54,91 @@ using (Stream stream = FormFileToBeUploaded.OpenReadStream()) {
                 <input asp-for="Cat.Name" class="form-control" />
                 <span asp-validation-for="Cat.Name" class="text-danger"></span>
             </div>
- +          <input type="file" asp-for="FormFileToBeUploaded" />
+           <input type="file" asp-for="FormFileToBeUploaded" />
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
 ```
 
+## Resize the image and move the new thumbnail into the thumbnails folder
+
+This is more problematic as it takes static container names as opposed to dynamically generated container name
+It may be better to have the web app do the resizing, then upload an original to the private container and the resized image to the thumbnails container
+That is if you decide to use dynamic containers. You can't deploy a separate function app for each container, can you?
+
+https://docs.microsoft.com/en-us/azure/event-grid/resize-images-on-storage-blob-upload-event?toc=%2Fazure%2Fstorage%2Fblobs%2Ftoc.json&tabs=dotnet
+
+1. Create a Function App service either in Azure portal or CLI, e.g.
+
+`az functionapp create --name <name-of-app> --storage-account <storage-account-name> --resource-group <Resource group name> --consumption-plan-location northeurope`
+
+2. Configure the app, either in Azure portal or CLI
+
+```
+az functionapp config appsettings set --name <name-of-app> --resource-group <Resource group name>
+--settings AzureWebJobsStorage=<storage-connection-string> THUMBNAIL_CONTAINER_NAME=thumbnails
+THUMBNAIL_WIDTH=100 FUNCTIONS_EXTENSION_VERSION=~2
+```
+
+3. Deploy the resizing code (it's premade by MS) on https://github.com/Azure-Samples/function-image-upload-resize and means you must use the thumbnails and images container names
+
+`az functionapp deployment source config --name $functionapp --resource-group $resourceGroupName --branch master --manual-integration --repo-url https://github.com/Azure-Samples/function-image-upload-resize`
+
+4. Wait a few minutes
+5. Create event subscription in Portal
+6. Select your function app in Portal
+7. Expand the Thumbnail function in Function (Read Only)
+8. Click Add Event Grid Subscription
+9. In Basic tab, give event a name, and choose Event Grid Schema. 
+10. Select Topic type to be  storage account and topic resource is your storage account (the csa..... one)
+11. Untick Subscribe to all event types and choose Blob Created in the next drop down
+12. In Filters tab, tick the box Enable subject filtering
+13. Subject Begins with: /blobServices/default/containers/images/blobs/
+14. Create
+
+## Download
+
+* In CS
+
+```
+public List<string> urlOfImages = GetThumbnailUrls(); // can include arguments if you wish
+
+public static async Task<List<string>> GetThumbnailUrls() {
+	List<string> imageUrls = new List<string>();
+
+	Uri containerUrl = new Uri(Secrets.thumbContainer2); // URL. Must be a public container to download
+	StorageCredentials cred = new StorageCredentials(Secrets.storageName2, Secrets.storageKey2);
+
+	CloudBlobContainer container = new CloudBlobContainer(containerUrl, cred);
+	BlobContinuationToken token = null;
+	BlobResultSegment resultSegment = null;
+
+	do {
+		resultSegment = await container.ListBlobsSegmentedAsync("", true, BlobListingDetails.All, 10, token, null, null);
+
+		foreach (var item in resultSegment.Results) {
+			imageUrls.Add(item.StorageUri.PrimaryUri.ToString());
+		}
+
+		token = resultSegment.ContinuationToken;
+	} while (token != null);   
+
+	// return imageUrls;
+
+	return await Task.FromResult(imageUrls);
+} 
+```
+
+* In razor page
+
+```
+@if (Model.urlOfImages.Count() > 0) {
+    @foreach (string item in Model.urlOfImages) {
+        <div>
+            <p>@item.ToString() </p>
+            <img src="@item" />
+        </div>
+    }
+}
+```
