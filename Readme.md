@@ -63,9 +63,10 @@ using (Stream stream = FormFileToBeUploaded.OpenReadStream()) {
 
 ## Resize the image and move the new thumbnail into the thumbnails folder
 
-This is more problematic as it takes static container names as opposed to dynamically generated container name
-It may be better to have the web app do the resizing, then upload an original to the private container and the resized image to the thumbnails container
-That is if you decide to use dynamic containers. You can't deploy a separate function app for each container, can you?
+Unsure if this works with dynamically generated containers. If the function app can only apply to a single container then there are a couple of options:
+
+* Have the web app resize the image on upload
+* Create a separate storage container and get the function app to identify anything that goes in according to criteria
 
 https://docs.microsoft.com/en-us/azure/event-grid/resize-images-on-storage-blob-upload-event?toc=%2Fazure%2Fstorage%2Fblobs%2Ftoc.json&tabs=dotnet
 
